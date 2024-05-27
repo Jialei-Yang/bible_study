@@ -1,4 +1,6 @@
-import streamlit as st, kings_story
+import streamlit as st
+import kings_story
+import toml
 
 st.set_page_config(layout="wide")
 
@@ -7,10 +9,16 @@ if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
     st.session_state['user_permissions'] = []
 
-# 扩展的用户凭证，包括权限信息
-USER_CREDENTIALS = {
-    "admin":   {"password": "password123",  "permissions": ["kings_story"]},
-}
+# 读取 TOML 文件
+def load_credentials(file_path='credentials.toml'):
+    """从 TOML 文件加载用户凭证和权限"""
+    try:
+        return toml.load(file_path)
+    except Exception as e:
+        st.error(f"无法加载凭证文件: {e}")
+        return {}
+
+USER_CREDENTIALS = load_credentials()
 
 def login(user, pwd):
     """验证用户登录凭证，并根据权限存储信息"""
