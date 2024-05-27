@@ -8,7 +8,7 @@ def run():
     df = pd.read_csv('database/kings_file.csv')
     
     # Streamlit 应用
-    st.title("以色列王国时期诸王信息")
+    st.title("以色列王国时期诸王")
     
     st.subheader('1.编年史', divider='rainbow')
     
