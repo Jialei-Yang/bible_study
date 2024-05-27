@@ -1,4 +1,4 @@
-import streamlit as st
+import streamlit as st, kings_story
 
 st.set_page_config(layout="wide")
 
@@ -9,7 +9,7 @@ if 'logged_in' not in st.session_state:
 
 # 扩展的用户凭证，包括权限信息
 USER_CREDENTIALS = {
-    "admin":   {"password": "password123",  "permissions": ["king_story"]},
+    "admin":   {"password": "password123",  "permissions": ["kings_story"]},
 }
 
 def login(user, pwd):
@@ -37,7 +37,7 @@ if not st.session_state['logged_in']:
 else:
     # 定义子应用与权限的映射
     app_permissions = {
-        '以色列王国时期诸王': 'king_story'
+        '以色列王国时期诸王': 'kings_story'
     }
 
     # 根据用户权限展示可用的子应用
@@ -51,4 +51,4 @@ else:
 
     # 根据选择加载不同的应用
     if app_selector == '以色列王国时期诸王':
-        king_story.run()
+        kings_story.run()
