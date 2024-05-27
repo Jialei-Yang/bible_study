@@ -1,0 +1,10 @@
+odps
+datetime
+psycopg2-binary
+xlsxwriter
+scipy
+plotly
+requests
+openpyxl
+toml
+pygwalker
