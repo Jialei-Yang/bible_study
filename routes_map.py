@@ -5,7 +5,7 @@ import plotly.express as px
 
 def load_data():
     # 读取上传的CSV文件
-    data = pd.read_csv('route_data.csv')
+    data = pd.read_csv('database/route_data.csv')
     # 分割位置信息列为经纬度两列
     data[['latitude', 'longitude']] = data['位置信息(经纬度)'].str.split(',', expand=True)
     data['latitude'] = pd.to_numeric(data['latitude'].str.strip(), errors='coerce')
