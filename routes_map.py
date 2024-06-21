@@ -17,8 +17,8 @@ def run():
 
     data = load_data()
     
-    # 获取所有系列名称
-    series_names = data['系列名称'].unique()
+    # 获取所有线路名称
+    series_names = data['线路名称'].unique()
     
     # 设置颜色刻度
     colorscale = px.colors.diverging.Earth
@@ -27,14 +27,14 @@ def run():
     st.title("历史路线展示")
     st.markdown("""
     这个应用展示了不同历史线路的相关信息。
-    您可以选择一个系列名称，并在地图上查看相关的历史路线。
+    您可以选择一个线路名称，并在地图上查看相关的历史路线。
     """)
     
-    # 添加一个选择框让用户选择系列名称
-    selected_series = st.selectbox("请选择系列名称:", series_names)
+    # 添加一个选择框让用户选择线路名称
+    selected_series = st.selectbox("请选择线路名称:", series_names)
     
-    # 过滤数据以显示选定系列的路线
-    filtered_data = data[data['系列名称'] == selected_series]
+    # 过滤数据以显示选定线路的路线
+    filtered_data = data[data['线路名称'] == selected_series]
     
     # 添加一个输入框让用户输入Mapbox访问令牌
     mapbox_token = st.text_input("请输入您的 Mapbox 访问令牌:")
