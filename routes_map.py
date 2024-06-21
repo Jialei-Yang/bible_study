@@ -74,7 +74,7 @@ def run():
     if mapbox_token:
         plot_route(filtered_data, mapbox_token)
     
-    st.dataframe(filtered_data)
+    st.dataframe(filtered_data, hide_index=True)
 
 if __name__ == "__main__":
     run()
