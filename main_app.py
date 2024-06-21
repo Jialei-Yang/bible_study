@@ -61,5 +61,5 @@ else:
     # 根据选择加载不同的应用
     if app_selector == '以色列王国时期诸王':
         kings_story.run()
-   elif app_selector == '历史路线地图合集':
+    elif app_selector == '历史路线地图合集':
         routes_map.run()
