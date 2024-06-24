@@ -29,17 +29,18 @@ def plot_route(data, token):
         hoverinfo='text',
         textposition='top right',
         textfont=dict(size=20, color='black'),
-        customdata=data[['序号', '主要人物', '主要事件', '短评', '信仰状态打分', '停留开始日期', '停留结束日期', '停留时间(天/年)']],
+        customdata=data[['序号', '主要人物', '主要历史事件', '短评', '信仰状态打分', '停留开始日期', '停留结束日期', '停留时间(天/年)', '相关经文']],
         hovertemplate=(
             "<b>%{text}</b><br><br>" +
             "序号: %{customdata[0]}<br>" +
             "主要人物: %{customdata[1]}<br>" +
-            "主要事件: %{customdata[2]}<br>" +
+            "主要历史事件: %{customdata[2]}<br>" +
             "短评: %{customdata[3]}<br>" +
             "信仰状态打分: %{customdata[4]}<br>" +
             "停留开始日期: %{customdata[5]}<br>" +
             "停留结束日期: %{customdata[6]}<br>" +
-            "停留时间(天/年): %{customdata[7]}<br>"
+            "停留时间(天/年): %{customdata[7]}<br>" +
+            "相关经文: %{customdata[8]}<br>" +
         )
     ))
 
