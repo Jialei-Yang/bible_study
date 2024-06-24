@@ -40,7 +40,7 @@ def plot_route(data, token):
             "停留开始日期: %{customdata[5]}<br>" +
             "停留结束日期: %{customdata[6]}<br>" +
             "停留时间(天/年): %{customdata[7]}<br>" +
-            "相关经文: %{customdata[8]}<br>" +
+            "相关经文: %{customdata[8]}<br>" 
         )
     ))
 
