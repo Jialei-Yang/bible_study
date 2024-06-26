@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
+import numpy as np
 
 def load_data(file_path):
     data = pd.read_csv(file_path)
@@ -9,6 +10,18 @@ def load_data(file_path):
     data['latitude'] = pd.to_numeric(data['latitude'].str.strip(), errors='coerce')
     data['longitude'] = pd.to_numeric(data['longitude'].str.strip(), errors='coerce')
     data['信仰状态打分'] = pd.to_numeric(data['信仰状态打分'], errors='coerce').astype(int)
+    return data
+
+def adjust_coordinates(data):
+    coords = data[['latitude', 'longitude']]
+    grouped = coords.groupby(['latitude', 'longitude']).size().reset_index(name='count')
+    for _, row in grouped.iterrows():
+        if row['count'] > 1:
+            indices = data[(data['latitude'] == row['latitude']) & (data['longitude'] == row['longitude'])].index
+            for i, idx in enumerate(indices):
+                angle = 2 * np.pi * i / row['count']
+                data.at[idx, 'latitude'] += 0.0001 * np.cos(angle)
+                data.at[idx, 'longitude'] += 0.0001 * np.sin(angle)
     return data
 
 def plot_route(data, token):
@@ -59,6 +72,7 @@ def plot_route(data, token):
 
 def run():
     data = load_data('database/routes_file.csv')
+    data = adjust_coordinates(data)
     series_names = data['线路名称'].unique()
 
     st.title("历史路线展示")
