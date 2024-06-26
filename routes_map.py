@@ -59,7 +59,7 @@ def plot_route(data, token):
 
     fig.update_layout(
         mapbox=dict(
-            style="mapbox://styles/jerry-yang/clxk1tvky00cj01qmffr1b1ag?access_token=pk.eyJ1IjoiamVycnkteWFuZyIsImEiOiJjbHRjdGdqZXMyOHJuMnFwM2h3dnR4bHJ3In0.HNFh6xxk1OSXxheC40EKBw,
+            style="mapbox://styles/jerry-yang/clxk1tvky00cj01qmffr1b1ag?access_token=pk.eyJ1IjoiamVycnkteWFuZyIsImEiOiJjbHRjdGdqZXMyOHJuMnFwM2h3dnR4bHJ3In0.HNFh6xxk1OSXxheC40EKBw",
             accesstoken=token,
             zoom=6,
             center=dict(lat=data['latitude'].mean(), lon=data['longitude'].mean())
