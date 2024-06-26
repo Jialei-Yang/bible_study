@@ -20,8 +20,8 @@ def adjust_coordinates(data):
             indices = data[(data['latitude'] == row['latitude']) & (data['longitude'] == row['longitude'])].index
             for i, idx in enumerate(indices):
                 angle = 2 * np.pi * i / row['count']
-                data.at[idx, 'latitude'] += 0.0001 * np.cos(angle)
-                data.at[idx, 'longitude'] += 0.0001 * np.sin(angle)
+                data.at[idx, 'latitude'] += 0.02 * np.cos(angle)
+                data.at[idx, 'longitude'] += 0.02 * np.sin(angle)
     return data
 
 def plot_route(data, token):
