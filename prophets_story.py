@@ -41,7 +41,7 @@ def run():
     fig.update_layout(
         xaxis_title="年份",
         yaxis_title="重要度评分",
-        xaxis=dict(range=[-1500, -500], dtick=100),
+        xaxis=dict(range=[-1500, -400], dtick=100),
         yaxis=dict(range=[0, 12], dtick=1),
         showlegend=False
     )
