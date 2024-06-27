@@ -1,5 +1,5 @@
 import streamlit as st
-import kings_story, routes_map
+import kings_story, prophets_story, routes_map
 import toml
 
 st.set_page_config(layout="wide")
@@ -46,6 +46,7 @@ else:
     # 定义子应用与权限的映射
     app_permissions = {
         '以色列王国时期诸王': 'kings_story', 
+        '以色列先知时期诸先知': 'prophets_story', 
         '历史路线地图合集'  : 'routes_map'
     }
 
@@ -61,5 +62,7 @@ else:
     # 根据选择加载不同的应用
     if app_selector == '以色列王国时期诸王':
         kings_story.run()
+    if app_selector == '以色列先知时期诸先知':
+        prophets_story.run()
     elif app_selector == '历史路线地图合集':
         routes_map.run()
