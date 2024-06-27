@@ -42,7 +42,7 @@ def run():
         xaxis_title="年份",
         yaxis_title="重要度评分",
         xaxis=dict(range=[-1500, -400], dtick=100),
-        yaxis=dict(range=[0, 12], dtick=1),
+        yaxis=dict(range=[0, 11], dtick=1),
         showlegend=False
     )
 
