@@ -4,7 +4,7 @@ import streamlit as st
 
 def run():
     # Load the CSV file
-    df = pd.read_csv('/mnt/data/characters_file.csv')
+    df = pd.read_csv('database/characters_file.csv')
 
     # Streamlit 应用
     st.title("以色列人物时期")
