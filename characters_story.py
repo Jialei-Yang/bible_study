@@ -22,7 +22,6 @@ def run():
     fig = go.Figure()
 
     for _, row in filtered_data.iterrows():
-        line_dash = 'solid' if row['人物类型排序'] == 1 else 'dash'
         hover_text = f"{row['中文名称']}<br>重要度评分: {row['重要度评分']}<br>评分原因: {row['重要度评分原因']}<br>在位时间: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
         fig.add_trace(go.Scatter(
             x=[row['任期开始年份'], row['任期结束年份']],
@@ -31,7 +30,7 @@ def run():
             name=row['中文名称'],
             text=[row['中文名称'], ''],
             textposition="top center",
-            line=dict(dash=line_dash),
+            line=dict(dash='solid'),
             hovertext=hover_text,
             hoverinfo='text+name'
         ))
@@ -40,8 +39,6 @@ def run():
     fig.update_layout(
         xaxis_title="年份",
         yaxis_title="重要度评分",
-        xaxis=dict(range=[-4000, 0], dtick=500),
-        yaxis=dict(range=[0, 11], dtick=1),
         showlegend=False
     )
 
@@ -51,7 +48,7 @@ def run():
     st.subheader('2.人物志', divider='rainbow')
 
     st.dataframe(
-        df,
+        filtered_data,
         column_config={
             '重要度评分': st.column_config.ProgressColumn(
                 '重要度评分',
