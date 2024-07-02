@@ -1,5 +1,5 @@
 import streamlit as st
-import kings_story, prophets_story, routes_map
+import kings_story, prophets_story, characters_story, routes_map
 import toml
 
 st.set_page_config(layout="wide")
@@ -47,6 +47,7 @@ else:
     app_permissions = {
         '以色列王国时期诸王': 'kings_story', 
         '以色列先知时期诸先知': 'prophets_story', 
+		'以色列各历史时期领袖': 'characters_story',
         '历史路线地图合集'  : 'routes_map'
     }
 
@@ -64,5 +65,7 @@ else:
         kings_story.run()
     if app_selector == '以色列先知时期诸先知':
         prophets_story.run()
+    if app_selector == '以色列各历史时期领袖':
+        characters_story.run()		
     elif app_selector == '历史路线地图合集':
         routes_map.run()
