@@ -15,6 +15,12 @@ def run():
     character_types = df['人物类型'].unique()
     selected_character_types = st.multiselect('选择一个或多个人物类型', character_types, default=character_types)
 
+    # 创建一个单选按钮来选择评分类型
+    score_type = st.radio(
+        "选择要展示的评分类型",
+        ('重要度评分', '信仰状态评分')
+    )
+
     # 根据选择的人物类型过滤数据
     filtered_data = df[df['人物类型'].isin(selected_character_types)]
 
@@ -22,10 +28,16 @@ def run():
     fig = go.Figure()
 
     for _, row in filtered_data.iterrows():
-        hover_text = f"{row['中文名称']}<br>重要度评分: {row['重要度评分']}<br>评分原因: {row['重要度评分原因']}<br>在位时间: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
+        if score_type == '重要度评分':
+            y_value = row['重要度评分']
+            hover_text = f"{row['中文名称']}<br>重要度评分: {row['重要度评分']}<br>评分原因: {row['重要度评分原因']}<br>在位时间: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
+        else:
+            y_value = row['信仰状态评分']
+            hover_text = f"{row['中文名称']}<br>信仰状态评分: {row['信仰状态评分']}<br>评分原因: {row['信仰状态评分原因']}<br>在位时间: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
+
         fig.add_trace(go.Scatter(
             x=[row['任期开始年份'], row['任期结束年份']],
-            y=[row['重要度评分'], row['重要度评分']],
+            y=[y_value, y_value],
             mode='lines+markers+text',
             name=row['中文名称'],
             text=[row['中文名称'], ''],
@@ -38,7 +50,7 @@ def run():
     # 更新布局
     fig.update_layout(
         xaxis_title="年份",
-        yaxis_title="重要度评分",
+        yaxis_title=score_type,
         showlegend=False
     )
 
