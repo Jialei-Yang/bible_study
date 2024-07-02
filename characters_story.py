@@ -4,7 +4,7 @@ import streamlit as st
 
 def run():
     # Load the CSV file
-    df = pd.read_csv('database/characters_file.csv')
+    df = pd.read_csv('/mnt/data/characters_file.csv')
 
     # Streamlit 应用
     st.title("以色列人物时期")
@@ -30,10 +30,10 @@ def run():
     for _, row in filtered_data.iterrows():
         if score_type == '重要度评分':
             y_value = row['重要度评分']
-            hover_text = f"{row['中文名称']}<br>重要度评分: {row['重要度评分']}<br>评分原因: {row['重要度评分原因']}<br>在位时间: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
+            hover_text = f"{row['中文名称']}<br>重要度评分: {row['重要度评分']}<br>评分原因: {row['重要度评分原因']}<br>任期时长: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
         else:
             y_value = row['信仰状态评分']
-            hover_text = f"{row['中文名称']}<br>信仰状态评分: {row['信仰状态评分']}<br>评分原因: {row['信仰状态评分原因']}<br>在位时间: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
+            hover_text = f"{row['中文名称']}<br>信仰状态评分: {row['信仰状态评分']}<br>评分原因: {row['信仰状态评分原因']}<br>任期时长: {row['任期时长']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}"
 
         fig.add_trace(go.Scatter(
             x=[row['任期开始年份'], row['任期结束年份']],
@@ -48,9 +48,11 @@ def run():
         ))
 
     # 更新布局
+    yaxis_range = [0, 11] if score_type == '重要度评分' else [-6, 6]
     fig.update_layout(
         xaxis_title="年份",
         yaxis_title=score_type,
+        yaxis=dict(range=yaxis_range, dtick=1),
         showlegend=False
     )
 
