@@ -79,7 +79,7 @@ def run():
         use_container_width=True
     )
 
-    st.subheader('3.评分标准', divider='rainbow')
+    st.subheader('3.评分依据及标准', divider='rainbow')
 
     col1, col2 = st.columns(2)
     
