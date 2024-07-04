@@ -27,15 +27,14 @@ def run():
     # 准备可视化数据
     fig = go.Figure()
 
+    # 为不同的人物类型分配颜色
+    colors = ['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A', '#19D3F3', '#FF6692', '#B6E880', '#FF97FF', '#FECB52']
+    type_to_color = {character_type: colors[i % len(colors)] for i, character_type in enumerate(character_types)}
+
     for _, row in filtered_data.iterrows():
-        if score_type == '重要度评分':
-            y_value = row['重要度评分']
-            hover_text = (f"{row['中文名称']}<br>任期时长: {row['任期时长']}<br>任期开始年份: {row['任期开始年份']}<br>任期结束年份: {row['任期结束年份']}<br>主要故事: {row['主要故事']}<br>"
-                          f"重要度评分: {row['重要度评分']}<br>评分原因: {row['重要度评分原因']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}")
-        else:
-            y_value = row['信仰状态评分']
-            hover_text = (f"{row['中文名称']}<br>任期时长: {row['任期时长']}<br>任期开始年份: {row['任期开始年份']}<br>任期结束年份: {row['任期结束年份']}<br>主要故事: {row['主要故事']}<br>"
-                          f"信仰状态评分: {row['信仰状态评分']}<br>评分原因: {row['信仰状态评分原因']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}")
+        y_value = row[score_type]
+        hover_text = (f"{row['中文名称']}<br>任期时长: {row['任期时长']}<br>任期开始年份: {row['任期开始年份']}<br>任期结束年份: {row['任期结束年份']}<br>主要故事: {row['主要故事']}<br>"
+                      f"{score_type}: {y_value}<br>评分原因: {row[score_type + '原因']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}")
 
         fig.add_trace(go.Scatter(
             x=[row['任期开始年份'], row['任期结束年份']],
@@ -44,7 +43,8 @@ def run():
             name=row['中文名称'],
             text=[row['中文名称'], ''],
             textposition="top center",
-            line=dict(dash='solid'),
+            line=dict(dash='solid', color=type_to_color[row['人物类型']]),
+            marker=dict(symbol='circle', size=10),
             hovertext=hover_text,
             hoverinfo='text+name'
         ))
