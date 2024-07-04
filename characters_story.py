@@ -33,7 +33,7 @@ def run():
 
     for _, row in filtered_data.iterrows():
         y_value = row[score_type]
-        hover_text = (f"{row['中文名称']}<br>任期时长: {row['任期时长']}<br>任期开始年份: {row['任期开始年份']}<br>任期结束年份: {row['任期结束年份']}<br>主要故事: {row['主要故事']}<br>"
+        hover_text = (f"{row['中文名称']}<br>人物类型: {row['人物类型']}<br>任期时长: {row['任期时长']}<br>任期开始年份: {row['任期开始年份']}<br>任期结束年份: {row['任期结束年份']}<br>主要故事: {row['主要故事']}<br>"
                       f"{score_type}: {y_value}<br>评分原因: {row[score_type + '原因']}<br>相关书卷: {row['相关书卷']}<br>被提到的次数: {row['被提及次数']}")
 
         fig.add_trace(go.Scatter(
