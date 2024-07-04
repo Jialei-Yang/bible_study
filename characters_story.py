@@ -13,7 +13,8 @@ def run():
 
     # 创建一个多选菜单来选择人物类型
     character_types = df['人物类型'].unique()
-    selected_character_types = st.multiselect('选择一个或多个人物类型', character_types, default=character_types)
+    default_types = ['4-国王(犹大)', '4-国王(统一王国)']  # 默认选择的值
+    selected_character_types = st.multiselect('选择一个或多个人物类型', character_types, default=default_types)
 
     # 创建一个单选按钮来选择评分类型
     score_type = st.radio(
