@@ -1,7 +1,5 @@
 # areas_map.py ──────────────────────────────────────────────
 import streamlit as st
-st.set_page_config(page_title="地图区域合集", layout="wide")
-
 import pandas as pd
 import plotly.express as px
 import requests, json, pathlib, numpy as np
@@ -9,7 +7,8 @@ from itertools import cycle
 from typing import Dict, Any, List
 
 def run():
-
+     st.title("地图区域合集")
+    
     # ───── 路径 / 文件 ─────────────────────────────────────────
     DB = pathlib.Path("database"); DB.mkdir(exist_ok=True)
     XLSX  = DB / "areas_file.xlsx"      # 主数据表
