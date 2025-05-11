@@ -1,4 +1,4 @@
-id,name_en,name_cn,type,state_iso,note
+id,name,name_cn,type,state_iso,note
 PA,Pennsylvania,宾夕法尼亚州,State,,示例州数据
 MA,Massachusetts,马萨诸塞州,State,,示例州数据
 CA,California,加利福尼亚州,State,,示例州数据
