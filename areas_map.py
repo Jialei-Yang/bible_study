@@ -9,7 +9,7 @@ from typing import Dict, Optional
 DATA_DIR   = pathlib.Path("database")                # ← 改这里
 DATA_DIR.mkdir(exist_ok=True)
 
-EXCEL_FILE = DATA_DIR / "regions_master.xlsx"        # 主表
+CSV_FILE = DATA_DIR / "areas_file.csv"               # 主表
 GEO_PATH   = DATA_DIR / "us_states_simple.geojson"   # 州轮廓
 CACHE_FILE = DATA_DIR / "city_cache.json"            # 城市缓存
 
@@ -24,7 +24,7 @@ def load_regions(path: pathlib.Path) -> pd.DataFrame:
     if not path.exists():
         st.error(f"找不到 {path.name}，请先放入 database/ 目录。")
         st.stop()
-    df = pd.read_excel(path, dtype=str)
+    df = pd.read_csv(CSV_FILE, dtype=str)
     expected = {"id", "name", "type", "state_iso", "note"}
     missing  = expected - set(df.columns)
     if missing:
