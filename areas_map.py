@@ -6,9 +6,10 @@ import requests, json, pathlib, numpy as np
 from itertools import cycle
 from typing import Dict, Any, List
 
+st.title("地图区域合集")
+
 def run():
-     st.title("地图区域合集")
-    
+     
     # ───── 路径 / 文件 ─────────────────────────────────────────
     DB = pathlib.Path("database"); DB.mkdir(exist_ok=True)
     XLSX  = DB / "areas_file.xlsx"      # 主数据表
