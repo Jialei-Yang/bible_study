@@ -45,10 +45,11 @@ if not st.session_state['logged_in']:
 else:
     # 定义子应用与权限的映射
     app_permissions = {
-        '以色列王国时期诸王': 'kings_story', 
+        '以色列王国时期诸王'  : 'kings_story', 
         '以色列先知时期诸先知': 'prophets_story', 
-		'以色列各历史时期领袖': 'characters_story',
-        '历史路线地图合集'  : 'routes_map'
+	'以色列各历史时期领袖': 'characters_story',
+        '历史路线地图合集'    : 'routes_map',
+	'地理区块标注'	    : 'areas_map'
     }
 
     # 根据用户权限展示可用的子应用
@@ -67,5 +68,7 @@ else:
         prophets_story.run()
     if app_selector == '以色列各历史时期领袖':
         characters_story.run()		
-    elif app_selector == '历史路线地图合集':
+    if app_selector == '历史路线地图合集':
         routes_map.run()
+    elif app_selector == '地理区块标注':
+        areas_map.run()
