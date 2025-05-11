@@ -1,161 +1,126 @@
-# areas_map.py
-# ────────────────────────────────────────────────────────────
-# 功能：读取 database/areas_file.csv   (State / City 清单)
-#      - 自动下载并缓存美国州 GeoJSON
-#      - 自动用 Mapbox Geocoding 获取城市中心点并缓存
-#      - Streamlit + Plotly 渲染：州 = 轮廓面，城市 = 红色中心点
-# 依赖：streamlit, pandas, plotly, requests
-# 运行：streamlit run areas_map.py
-# ────────────────────────────────────────────────────────────
+# areas_map.py ──────────────────────────────────────────────
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-import requests, json, pathlib
-from typing import Dict, Optional
+st.set_page_config(page_title="地图区域合集", layout="wide")
 
-def run():
-      
-    # ───────── ① 路径常量 ─────────
-    DATA_DIR    = pathlib.Path("database")
-    DATA_DIR.mkdir(exist_ok=True)
-    
-    CSV_FILE    = DATA_DIR / "areas_file.csv"
-    GEO_PATH    = DATA_DIR / "us_states_simple.geojson"
-    CACHE_FILE  = DATA_DIR / "city_cache.json"
-    
-    GEOJSON_SRC = (
-        "https://cdn.jsdelivr.net/gh/PublicaMundi/MappingAPI@master/"
-        "data/geojson/us-states.json"
-    )
-    
-    # ───────── ② 读取 CSV ─────────
-    @st.cache_data(show_spinner=False)
-    def load_regions(path: pathlib.Path) -> pd.DataFrame:
-        if not path.exists():
-            st.error(f"❌ 未找到 {path.name}，请先放入 database/ 目录")
-            st.stop()
-        df = pd.read_csv(path, dtype=str)
-        exp_cols = {"id", "name", "type", "state_iso", "note"}
-        missing  = exp_cols - set(df.columns)
-        if missing:
-            st.error(f"CSV 缺少列：{', '.join(missing)}")
-            st.stop()
-        return df
-    
-    regions_df = load_regions(CSV_FILE)
-    
-    # ───────── ③ 获取州 GeoJSON ─────────
-    @st.cache_resource(show_spinner=False)
-    def get_states_geo() -> Dict:
-        if GEO_PATH.exists():
-            return json.loads(GEO_PATH.read_text())
-        with st.spinner("首次运行：下载州轮廓 GeoJSON …"):
-            r = requests.get(GEOJSON_SRC, timeout=30)
-            r.raise_for_status()
-            GEO_PATH.write_text(r.text)
-            return r.json()
-    
-    states_geo = get_states_geo()
-    
-    # ───────── ④ 城市坐标获取与缓存 ─────────
-    def geocode_city(city: str, state: str, token: str) -> Optional[Dict]:
-        if CACHE_FILE.exists():
-            cache = json.loads(CACHE_FILE.read_text())
-        else:
-            cache = {}
-    
-        key = f"{city},{state}"
-        if key in cache:
-            return cache[key]
-    
+import pandas as pd, pathlib, json, requests, plotly.express as px
+from itertools import cycle
+from typing import Dict, Optional, List, Any
+import io
+
+# ─── 常量 / 路径 ───────────────────────────────────────────
+DB = pathlib.Path("database"); DB.mkdir(exist_ok=True)
+XLSX  = DB / "areas_file.xlsx"
+CITYC = DB / "city_cache.json"
+COLOR_POOL = px.colors.qualitative.Plotly + px.colors.qualitative.D3
+
+# ─── 读取表 ───────────────────────────────────────────────
+@st.cache_data
+def load_table(path: pathlib.Path) -> pd.DataFrame:
+    return pd.read_excel(path, dtype=str)
+
+def load_geo(path: pathlib.Path) -> Dict[str, Any]:
+    if not path.exists():
+        st.error(f"❌ GeoJSON 文件不存在：{path}")
+        st.stop()
+    return json.loads(path.read_text())
+
+df = load_table(XLSX)
+
+# ─── UI：区域组选择 & Token ──────────────────────────────
+groups = sorted(df["地理区域组"].unique())
+sel_group = st.selectbox("选择『地理区域组』", groups)
+
+token = st.text_input("Mapbox Access Token", type="password")
+if not token:
+    st.info("请输入有效 Mapbox Token")
+    st.stop()
+
+# ─── 当前区域组 & GeoJSON 文件 ──────────────────────────
+view = df[df["地理区域组"] == sel_group].copy()
+geo_files = view["geo文件"].unique().tolist()
+if len(geo_files) != 1:
+    st.error("同一『地理区域组』应指向唯一 geo文件，请检查 Excel")
+    st.stop()
+
+geo = load_geo(DB / geo_files[0])
+
+# ─── 颜色映射（按“分组”） ──────────────────────────────
+groups_in_df = sorted(view["分组"].unique())
+color_cycle = cycle(COLOR_POOL)
+color_map = {g: next(color_cycle) for g in groups_in_df}
+
+# ─── 数据拆分 ───────────────────────────────────────────
+states = view[view["地理类型"] == "州"].copy()
+cities = view[view["地理类型"] == "城市"].copy()
+states["颜色"] = states["分组"].map(color_map)
+states["dummy"] = states["分组"]  # 着色列
+
+# ─── 州层 ───────────────────────────────────────────────
+fig = px.choropleth_mapbox(
+    states,
+    geojson=geo,
+    locations="代码",
+    featureidkey="id",
+    color="dummy",
+    color_discrete_map=color_map,
+    hover_data={
+        "名称(中文)": True,
+        "名称(英文)": True,
+        "分组": True,
+        "描述": True,
+        "dummy": False
+    },
+    opacity=0.35,
+    mapbox_style="carto-positron",
+    zoom=3, center=dict(lat=37.8, lon=-96)
+)
+
+# ─── 城市坐标（缓存 + Geocoding） ──────────────────────
+cache = json.loads(CITYC.read_text()) if CITYC.exists() else {}
+lat, lon, hovertext = [], [], []
+
+for _, row in cities.iterrows():
+    code, en_name = row["代码"], row["名称(英文)"]
+    if code in cache:
+        coord = cache[code]
+    else:
         url = (f"https://api.mapbox.com/geocoding/v5/mapbox.places/"
-               f"{city}%2C%20{state}.json?limit=1&access_token={token}")
+               f"{en_name.replace(' ', '%20')}.json?limit=1&access_token={token}")
         try:
             res = requests.get(url, timeout=10).json()
-            feats = res.get("features")
-            if feats:
-                lon, lat = feats[0]["center"]
-                cache[key] = {"lat": lat, "lon": lon}
-                CACHE_FILE.write_text(json.dumps(cache, ensure_ascii=False, indent=2))
-                return cache[key]
+            lon_, lat_ = res["features"][0]["center"]
+            coord = {"lat": lat_, "lon": lon_}
+            cache[code] = coord
         except Exception as e:
-            st.warning(f"Geocoding '{key}' 失败：{e}")
-        return None
-    
-    # ───────── ⑤ 侧边栏调试开关 ─────────
-    debug = st.sidebar.checkbox("调试模式")
-    
-    # ───────── ⑥ 诊断：ID 匹配情况 ─────────
-    state_df = regions_df[regions_df["type"].str.lower() == "state"].copy()
-    feature_ids = {f.get("id") for f in states_geo["features"]}
-    missing_states = state_df[~state_df["id"].isin(feature_ids)]
-    
-    if debug:
-        st.sidebar.markdown("#### 诊断信息")
-        st.sidebar.write(f"州行数：{len(state_df)}")
-        st.sidebar.write(f"GeoJSON 州数量：{len(feature_ids)}")
-        if not missing_states.empty:
-            st.sidebar.error(f"⚠️ 下列州 ID 未在 GeoJSON 中找到：{missing_states['id'].tolist()}")
-        else:
-            st.sidebar.success("所有州 ID 均成功匹配 GeoJSON")
-    
-        st.sidebar.markdown("**GeoJSON 首条示例**")
-        st.sidebar.json(states_geo["features"][0])
-    
-    # ───────── ⑦ 绘图函数 ─────────
-    def render_map(token: str):
-        city_df = regions_df[regions_df["type"].str.lower() == "city"].copy()
-    
-        # 给城市补经纬度
-        unresolved = []
-        for idx, row in city_df.iterrows():
-            if pd.notna(row.get("lat")) and pd.notna(row.get("lon")):
-                continue
-            coord = geocode_city(row["name"], row["state_iso"], token)
-            if coord:
-                city_df.at[idx, "lat"] = coord["lat"]
-                city_df.at[idx, "lon"] = coord["lon"]
-            else:
-                unresolved.append(row["name"])
-    
-        # 州：加常量列用于着色
-        display_states = state_df.copy()
-        display_states["fill"] = 1
-    
-        fig = px.choropleth_mapbox(
-            display_states,
-            geojson=states_geo,
-            locations="id",
-            featureidkey="id",
-            color="fill",
-            color_discrete_sequence=["#8ecae6"],
-            hover_name="name",
-            opacity=0.4,
-            mapbox_style="carto-positron",
-            zoom=3, center=dict(lat=37.8, lon=-96),
-        )
-    
-        # 城市点
-        ok = city_df.dropna(subset=["lat", "lon"])
-        fig.add_scattermapbox(
-            lat=ok["lat"], lon=ok["lon"],
-            text=ok["name"],
-            mode="markers+text",
-            marker=dict(size=10, color="red"),
-            textposition="top right"
-        )
-    
-        fig.update_layout(mapbox_accesstoken=token, margin=dict(l=0,r=0,t=0,b=0))
-        st.plotly_chart(fig, use_container_width=True)
-    
-        # 调试：未能 geocode 的城市
-        if debug and unresolved:
-            st.warning(f"以下城市地理编码失败，请检查拼写或手动补经纬度：{unresolved}")
-    
-    # ───────── ⑧ Streamlit 页面 ─────────
-    st.title("areas_map — 州 / 城市区块可视化")
+            st.warning(f"Geocoding '{en_name}' 失败：{e}")
+            continue
+    lat.append(coord["lat"])
+    lon.append(coord["lon"])
+    hovertext.append(
+        f"<b>{row['名称(中文)']}</b><br>"
+        f"{row['名称(英文)']}<br>"
+        f"分组：{row['分组']}<br>"
+        f"{row['描述']}"
+    )
 
-    
-# 运行应用
-if __name__ == "__main__":
-    run()
+CITYC.write_text(json.dumps(cache, ensure_ascii=False, indent=2))
+
+# ─── 城市散点（固定红色，不入图例） ──────────────────
+fig.add_scattermapbox(
+    lat=lat,
+    lon=lon,
+    mode="markers+text",
+    text=[row["名称(中文)"] for _, row in cities.iterrows()],
+    marker=dict(size=10, color="red"),
+    hovertext=hovertext,
+    hoverinfo="text",
+    textposition="top right",
+    showlegend=False           # ← 隐藏图例条目
+)
+
+fig.update_layout(mapbox_accesstoken=token, margin=dict(l=0,r=0,t=0,b=0))
+st.plotly_chart(fig, use_container_width=True)
+
+
+st.markdown("### 当前区域组数据预览")
+st.dataframe(view, hide_index=True)
