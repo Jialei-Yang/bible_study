@@ -14,7 +14,6 @@ import requests, json, pathlib
 from typing import Dict, Optional
 
 def run():
-    st.set_page_config(page_title="areas_map", layout="wide")
     
     # ───────── ① 路径常量 ─────────
     DATA_DIR    = pathlib.Path("database")
