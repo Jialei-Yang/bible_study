@@ -1,5 +1,5 @@
 import streamlit as st
-import kings_story, prophets_story, characters_story, routes_map
+import kings_story, prophets_story, characters_story, routes_map, areas_map
 import toml
 
 st.set_page_config(layout="wide")
