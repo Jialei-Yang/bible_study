@@ -83,39 +83,47 @@ def run():
         return None
     
     # ───────── ⑤ 绘图函数 ─────────
+
     def render_map(token: str):
-        state_df = regions_df[regions_df["type"].str.lower() == "state"]
+        state_df = regions_df[regions_df["type"].str.lower() == "state"].copy()
         city_df  = regions_df[regions_df["type"].str.lower() == "city"].copy()
     
-        # 给城市补经纬度
+        # ① 城市经纬度补全（同原逻辑）
         for idx, row in city_df.iterrows():
             if pd.notna(row.get("lat")) and pd.notna(row.get("lon")):
-                continue   # Excel 里已手填
+                continue
             coord = geocode_city(row["name"], row["state_iso"], token)
             if coord:
                 city_df.at[idx, "lat"] = coord["lat"]
                 city_df.at[idx, "lon"] = coord["lon"]
     
-        # 州轮廓
+        # ② 给州添加常量列，用于着色
+        state_df["fill"] = 1  # 任意常数即可
+    
+        # ③ 州轮廓
         fig = px.choropleth_mapbox(
             state_df,
             geojson=states_geo,
             locations="id",
+            featureidkey="id",            # 若 GeoJSON 用其他键，如 properties.code 请改这里
+            color="fill",                 # 只需列存在即可
             color_discrete_sequence=["#8ecae6"],
             hover_name="name",
             opacity=0.35,
             mapbox_style="carto-positron",
-            zoom=3, center=dict(lat=37.8, lon=-96),
+            zoom=3,
+            center=dict(lat=37.8, lon=-96),
         )
     
-        # 城市点
+        # ④ 城市点
         ok = city_df.dropna(subset=["lat", "lon"])
         fig.add_scattermapbox(
-            lat=ok["lat"], lon=ok["lon"],
+            lat=ok["lat"],
+            lon=ok["lon"],
             text=ok["name"],
             mode="markers+text",
             marker=dict(size=10, color="red"),
-            textposition="top right"
+            textposition="top right",
         )
     
         fig.update_layout(
