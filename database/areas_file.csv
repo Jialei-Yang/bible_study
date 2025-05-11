@@ -1,7 +1,7 @@
-id,name,type,state_iso,note
-PA,宾夕法尼亚州,State,,示例州数据
-MA,马萨诸塞州,State,,示例州数据
-CA,加利福尼亚州,State,,示例州数据
-BOS,波士顿,City,MA,示例城市数据
-PHL,费城,City,PA,示例城市数据
-LA,洛杉矶,City,CA,示例城市数据
+id,name_en,name_cn,type,state_iso,note
+PA,Pennsylvania,宾夕法尼亚州,State,,示例州数据
+MA,Massachusetts,马萨诸塞州,State,,示例州数据
+CA,California,加利福尼亚州,State,,示例州数据
+BOS,Boston,波士顿,City,MA,示例城市数据
+PHL,Philadelphia,费城,City,PA,示例城市数据
+LA,Los Angeles,洛杉矶,City,CA,示例城市数据
