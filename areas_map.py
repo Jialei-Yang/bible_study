@@ -134,6 +134,7 @@ def run():
         text=text,
         mode="markers+text",
         marker=dict(size=10, color="red"),
+        textfont=dict(color="red"),
         hovertext=hover, hoverinfo="text",
         textposition="top right",
         showlegend=False
