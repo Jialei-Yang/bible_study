@@ -13,6 +13,8 @@ import plotly.express as px
 import requests, json, pathlib
 from typing import Dict, Optional
 
+st.set_page_config(page_title="areas_map", layout="wide")
+
 # ───────── ① 路径常量 ─────────
 DATA_DIR    = pathlib.Path("database")
 DATA_DIR.mkdir(exist_ok=True)
@@ -123,7 +125,6 @@ def render_map(token: str):
     st.plotly_chart(fig, use_container_width=True)
 
 # ───────── ⑥ Streamlit 页面 ─────────
-st.set_page_config(page_title="areas_map", layout="wide")
 st.title("areas_map — 州 / 城市区块可视化")
 
 st.markdown("""
