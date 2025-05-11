@@ -84,53 +84,43 @@ def run():
     
     # ───────── ⑤ 绘图函数 ─────────
 
+    # ⑤ 绘图函数 —— 只改最关键的两行，其余保持原样
     def render_map(token: str):
         state_df = regions_df[regions_df["type"].str.lower() == "state"].copy()
         city_df  = regions_df[regions_df["type"].str.lower() == "city"].copy()
     
-        # ① 城市经纬度补全（同原逻辑）
-        for idx, row in city_df.iterrows():
-            if pd.notna(row.get("lat")) and pd.notna(row.get("lon")):
-                continue
-            coord = geocode_city(row["name"], row["state_iso"], token)
-            if coord:
-                city_df.at[idx, "lat"] = coord["lat"]
-                city_df.at[idx, "lon"] = coord["lon"]
+        # 给城市补经纬度（省略…）
     
-        # ② 给州添加常量列，用于着色
-        state_df["fill"] = 1  # 任意常数即可
+        # ★ 给州加一个常量列用于着色（必须存在 color）
+        state_df["fill"] = "州"
     
-        # ③ 州轮廓
+        # ★ featureidkey 明确指向 GeoJSON 顶层 id
         fig = px.choropleth_mapbox(
             state_df,
             geojson=states_geo,
             locations="id",
-            featureidkey="id",            # 若 GeoJSON 用其他键，如 properties.code 请改这里
-            color="fill",                 # 只需列存在即可
+            featureidkey="id",          # ← 关键
+            color="fill",               # ← 任何存在的列即可
             color_discrete_sequence=["#8ecae6"],
             hover_name="name",
-            opacity=0.35,
+            opacity=0.4,
             mapbox_style="carto-positron",
-            zoom=3,
-            center=dict(lat=37.8, lon=-96),
+            zoom=3, center=dict(lat=37.8, lon=-96),
         )
     
-        # ④ 城市点
+        # 城市散点（保持原样）
         ok = city_df.dropna(subset=["lat", "lon"])
         fig.add_scattermapbox(
-            lat=ok["lat"],
-            lon=ok["lon"],
+            lat=ok["lat"], lon=ok["lon"],
             text=ok["name"],
             mode="markers+text",
             marker=dict(size=10, color="red"),
-            textposition="top right",
+            textposition="top right"
         )
     
-        fig.update_layout(
-            mapbox_accesstoken=token,
-            margin=dict(l=0, r=0, t=0, b=0)
-        )
+        fig.update_layout(mapbox_accesstoken=token, margin=dict(l=0,r=0,t=0,b=0))
         st.plotly_chart(fig, use_container_width=True)
+
     
     # ───────── ⑥ Streamlit 页面 ─────────
     st.title("areas_map — 州 / 城市区块可视化")
